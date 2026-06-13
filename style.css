@@ -16,15 +16,8 @@
 }
 
 .calendar-day {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr); 
-  gap: 8px;
-  width: 100%;
-  max-width: 800px;
-}
-.calendar-day {
   border: 1px solid #ccc;
-  min-height: 100px; /* Forces a rectangular shape */
+  min-height: 100px;
   padding: 5px;
   box-sizing: border-box;
 }
