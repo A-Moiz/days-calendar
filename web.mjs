@@ -34,7 +34,9 @@ const DAYS = [
 let CURRENT_YEAR = new Date().getFullYear();
 let CURRENT_MONTH = new Date().getMonth();
 
-// DOM Elements
+const FIXED_START_YEAR = CURRENT_YEAR - 100;
+const FIXED_END_YEAR = CURRENT_YEAR + 100;
+
 const defaultMsg = document.getElementById("default-msg");
 const monthSelect = document.getElementById("month-select");
 const yearSelect = document.getElementById("year-select");
@@ -42,7 +44,6 @@ const calendarGrid = document.getElementById("calendar-grid");
 const prevBtn = document.getElementById("previous-month-btn");
 const nextBtn = document.getElementById("next-month-btn");
 
-// Initialize function
 function init() {
   createMonthOptions();
   createYearOptions();
@@ -124,10 +125,8 @@ function createMonthOptions() {
 
 // Creating options for years
 function createYearOptions() {
-  const startYear = CURRENT_YEAR - 100;
-  const endYear = CURRENT_YEAR + 100;
-
-  for (let year = startYear; year <= endYear; year++) {
+  yearSelect.innerHTML = "";
+  for (let year = FIXED_START_YEAR; year <= FIXED_END_YEAR; year++) {
     const option = document.createElement("option");
     option.value = year;
     option.textContent = `${year}`;
@@ -177,5 +176,4 @@ function renderCalendar(monthName, year) {
   }
 }
 
-// Calling initialize function
 init();
