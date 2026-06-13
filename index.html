@@ -3,6 +3,27 @@
   <head>
     <script type="module" src="common.mjs"></script>
     <script type="module" src="web.mjs"></script>
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body></body>
+  <body>
+    <h1>Days Calendar Project</h1>
+    <main>
+      <section>
+        <div>
+          <button id="previous-month-btn">Previous Month</button>
+          <button id="next-month-btn">Next Month</button>
+        </div>
+        <div>
+          <label for="month-select">Jump to Month</label>
+          <select id="month-select"></select>
+          <label for="year-select">Jump to Year</label>
+          <select id="year-select"></select>
+        </div>
+      </section>
+
+      <section>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </section>
+    </main>
+  </body>
 </html>
