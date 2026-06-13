@@ -32,15 +32,18 @@ const FIXED_END_YEAR = CURRENT_YEAR + 100;
 const defaultMsg = document.getElementById("default-msg");
 const monthSelect = document.getElementById("month-select");
 const yearSelect = document.getElementById("year-select");
-const calendarGrid = document.getElementById("calendar-grid");
+const calendarGrid = document.getElementById("calendar-grid")
 const prevBtn = document.getElementById("previous-month-btn");
-const nextBtn = document.getElementById("next-month-btn");
+const nextBtn = document.getElementById("next-month-btn");;
 
 function init() {
   createMonthOptions();
   createYearOptions();
   createDaysOptions();
   updateSelectorsAndRender();
+  monthSelect.value = MONTHS[CURRENT_MONTH];
+  yearSelect.value = CURRENT_YEAR;
+  renderCalendar(monthSelect.value, yearSelect.value);
 }
 
 monthSelect.addEventListener("change", (e) => {
@@ -61,12 +64,6 @@ prevBtn.addEventListener("click", () => {
     CURRENT_MONTH = 11;
     CURRENT_YEAR--;
   }
-
-  if (CURRENT_YEAR < FIXED_START_YEAR) {
-    CURRENT_YEAR = FIXED_END_YEAR;
-    CURRENT_MONTH = 11;
-  }
-  
   updateSelectorsAndRender();
 });
 
@@ -76,21 +73,16 @@ nextBtn.addEventListener("click", () => {
     CURRENT_MONTH = 0;
     CURRENT_YEAR++;
   }
-
-  if (CURRENT_YEAR > FIXED_END_YEAR) {
-    CURRENT_YEAR = FIXED_START_YEAR;
-    CURRENT_MONTH = 0;
-  }
-  
   updateSelectorsAndRender();
 });
 
+// Update selectors and render calendar
 function updateSelectorsAndRender() {
   monthSelect.value = MONTHS[CURRENT_MONTH];
   yearSelect.value = CURRENT_YEAR;
-  renderCalendar(MONTHS[CURRENT_MONTH], CURRENT_YEAR);
+  renderCalendar(monthSelect.value, yearSelect.value);
 }
-
+// Creating options for months
 function createMonthOptions() {
   MONTHS.forEach((id) => {
     const option = document.createElement("option");
