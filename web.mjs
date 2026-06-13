@@ -1,13 +1,3 @@
-// This is a placeholder file which shows how you can access functions and data defined in other files.
-// It can be loaded into index.html.
-// Note that when running locally, in order to open a web page which uses modules, you must serve the directory over HTTP e.g. with https://www.npmjs.com/package/http-server
-// You can't open the index.html file using a file:// URL.
-
-// Imports
-// import { getGreeting } from "./common.mjs";
-// import daysData from "./days.json" with { type: "json" };
-
-// Consts
 const MONTHS = [
   "January",
   "February",
@@ -36,7 +26,9 @@ const DAYS = [
 let CURRENT_YEAR = new Date().getFullYear();
 let CURRENT_MONTH = new Date().getMonth();
 
-// DOM Elements
+const FIXED_START_YEAR = CURRENT_YEAR - 100;
+const FIXED_END_YEAR = CURRENT_YEAR + 100;
+
 const defaultMsg = document.getElementById("default-msg");
 const monthSelect = document.getElementById("month-select");
 const yearSelect = document.getElementById("year-select");
@@ -44,7 +36,6 @@ const calendarGrid = document.getElementById("calendar-grid")
 const prevBtn = document.getElementById("previous-month-btn");
 const nextBtn = document.getElementById("next-month-btn");;
 
-// Initialize function
 function init() {
   createMonthOptions();
   createYearOptions();
@@ -55,12 +46,15 @@ function init() {
   renderCalendar(monthSelect.value, yearSelect.value);
 }
 
-// Event listeners
-monthSelect.addEventListener("change", () => {
+monthSelect.addEventListener("change", (e) => {
+  if (!e.isTrusted) return;
+  CURRENT_MONTH = MONTHS.indexOf(monthSelect.value);
   renderCalendar(monthSelect.value, yearSelect.value);
 });
 
-yearSelect.addEventListener("change", () => {
+yearSelect.addEventListener("change", (e) => {
+  if (!e.isTrusted) return;
+  CURRENT_YEAR = parseInt(yearSelect.value);
   renderCalendar(monthSelect.value, yearSelect.value);
 });
 
@@ -98,12 +92,9 @@ function createMonthOptions() {
   });
 }
 
-// Creating options for months
 function createYearOptions() {
-  const startYear = CURRENT_YEAR - 100;
-  const endYear = CURRENT_YEAR + 100;
-
-  for (let year = startYear; year <= endYear; year++) {
+  yearSelect.innerHTML = "";
+  for (let year = FIXED_START_YEAR; year <= FIXED_END_YEAR; year++) {
     const option = document.createElement("option");
     option.value = year;
     option.textContent = `${year}`;
@@ -111,7 +102,6 @@ function createYearOptions() {
   }
 }
 
-// Creating options for days of the  week
 function createDaysOptions() {
   DAYS.forEach((id) => {
     const divOption = document.createElement("div");
@@ -122,7 +112,6 @@ function createDaysOptions() {
   });
 }
 
-// Getting details for the selected month and year
 function fetchMonthDetails(monthName, year) {
   const monthIndex = MONTHS.indexOf(monthName);
   const firstDay = new Date(year, monthIndex, 1);
@@ -152,5 +141,4 @@ function renderCalendar(monthName, year) {
   }
 }
 
-// Calling initialize function
 init();
