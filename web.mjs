@@ -40,13 +40,16 @@ let CURRENT_MONTH = new Date().getMonth();
 const defaultMsg = document.getElementById("default-msg");
 const monthSelect = document.getElementById("month-select");
 const yearSelect = document.getElementById("year-select");
-const calendarGrid = document.getElementById("calendar-grid");
+const calendarGrid = document.getElementById("calendar-grid")
+const prevBtn = document.getElementById("previous-month-btn");
+const nextBtn = document.getElementById("next-month-btn");;
 
 // Initialize function
 function init() {
   createMonthOptions();
   createYearOptions();
   createDaysOptions();
+  updateSelectorsAndRender();
   monthSelect.value = MONTHS[CURRENT_MONTH];
   yearSelect.value = CURRENT_YEAR;
   renderCalendar(monthSelect.value, yearSelect.value);
@@ -61,6 +64,30 @@ yearSelect.addEventListener("change", () => {
   renderCalendar(monthSelect.value, yearSelect.value);
 });
 
+prevBtn.addEventListener("click", () => {
+  CURRENT_MONTH--;
+  if (CURRENT_MONTH < 0) {
+    CURRENT_MONTH = 11;
+    CURRENT_YEAR--;
+  }
+  updateSelectorsAndRender();
+});
+
+nextBtn.addEventListener("click", () => {
+  CURRENT_MONTH++;
+  if (CURRENT_MONTH > 11) {
+    CURRENT_MONTH = 0;
+    CURRENT_YEAR++;
+  }
+  updateSelectorsAndRender();
+});
+
+// Update selectors and render calendar
+function updateSelectorsAndRender() {
+  monthSelect.value = MONTHS[CURRENT_MONTH];
+  yearSelect.value = CURRENT_YEAR;
+  renderCalendar(monthSelect.value, yearSelect.value);
+}
 // Creating options for months
 function createMonthOptions() {
   MONTHS.forEach((id) => {
