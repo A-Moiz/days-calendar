@@ -3,8 +3,6 @@
 // Note that when running locally, in order to open a web page which uses modules, you must serve the directory over HTTP e.g. with https://www.npmjs.com/package/http-server
 // You can't open the index.html file using a file:// URL.
 
-// Imports
-
 // Global
 const MONTHS = [
   "January",
@@ -31,23 +29,31 @@ const DAYS = [
   "Saturday",
 ];
 
+const OCCURRENCE_MAP = {
+  first: 1,
+  second: 2,
+  third: 3,
+  fourth: 4,
+};
+
 let CURRENT_YEAR = new Date().getFullYear();
 let CURRENT_MONTH = new Date().getMonth();
-
 const FIXED_START_YEAR = CURRENT_YEAR - 100;
 const FIXED_END_YEAR = CURRENT_YEAR + 100;
+let daysData = [];
 
-const defaultMsg = document.getElementById("default-msg");
+// DOM elements
 const monthSelect = document.getElementById("month-select");
 const yearSelect = document.getElementById("year-select");
 const calendarGrid = document.getElementById("calendar-grid");
 const prevBtn = document.getElementById("previous-month-btn");
 const nextBtn = document.getElementById("next-month-btn");
 
-function init() {
+async function init() {
   createMonthOptions();
   createYearOptions();
   createDaysOptions();
+  await loadDaysData();
   renderCurrentView();
 }
 
@@ -156,24 +162,97 @@ function getMonthDetails(monthName, year) {
 
 // Render calendar
 function renderCalendar(monthName, year) {
-  // Redrawing grid
   const headers = calendarGrid.querySelectorAll(".day-header");
   calendarGrid.innerHTML = "";
   headers.forEach((header) => calendarGrid.appendChild(header));
-  const { startDayOfWeek, totalDaysInMonth } = getMonthDetails(monthName, year);
+  const { startDayOfWeekIndex, totalDaysInMonth } = getMonthDetails(
+    monthName,
+    year,
+  );
 
-  for (let i = 0; i < startDayOfWeek; i++) {
+  // Blank padding blocks
+  for (let i = 0; i < startDayOfWeekIndex; i++) {
     const blankBlock = document.createElement("div");
     blankBlock.classList.add("calendar-day", "empty-day");
     calendarGrid.appendChild(blankBlock);
   }
 
+  // Rendering number days
   for (let day = 1; day <= totalDaysInMonth; day++) {
     const dayBlock = document.createElement("div");
     dayBlock.classList.add("calendar-day");
-    dayBlock.textContent = day;
+
+    const numberLabel = document.createElement("span");
+    numberLabel.textContent = day;
+    dayBlock.appendChild(numberLabel);
+
+    daysData.forEach((event) => {
+      if (event.monthName === monthName) {
+        const eventDay = calculateEventDay(
+          parseInt(year, 10),
+          event.monthName,
+          event.dayName,
+          event.occurrence,
+        );
+
+        if (eventDay === day) {
+          const eventLabel = document.createElement("div");
+          eventLabel.classList.add("event-label");
+          eventLabel.textContent = event.name;
+          dayBlock.appendChild(eventLabel);
+        }
+      }
+    });
+
     calendarGrid.appendChild(dayBlock);
   }
+}
+
+// Fetch data from days.json
+async function loadDaysData() {
+  try {
+    const response = await fetch("days.json");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    daysData = await response.json();
+  } catch (error) {
+    alert("Failed to load days.json data file: ", error);
+  }
+}
+
+// Calculating day for an event
+function calculateEventDay(year, monthName, dayName, occurrence) {
+  const monthIndex = MONTHS.indexOf(monthName);
+  const targetDayOfWeek = DAYS.indexOf(dayName);
+
+  // Going backwards to find "last" day
+  if (occurrence === "last") {
+    const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+    for (let day = totalDays; day >= 1; day--) {
+      const currentDayOfWeek = new Date(year, monthIndex, day).getDay();
+      if (currentDayOfWeek === targetDayOfWeek) {
+        return day;
+      }
+    }
+  }
+
+  const targetCount = OCCURRENCE_MAP[occurrence];
+  let matchCount = 0;
+  const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+
+  for (let day = 1; day <= totalDays; day++) {
+    const currentDayOfWeek = new Date(year, monthIndex, day).getDay();
+
+    if (currentDayOfWeek === targetDayOfWeek) {
+      matchCount++;
+      if (matchCount === targetCount) {
+        return day;
+      }
+    }
+  }
+
+  return null;
 }
 
 init();
