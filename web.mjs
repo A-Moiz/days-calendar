@@ -1,40 +1,4 @@
-// This is a placeholder file which shows how you can access functions and data defined in other files.
-// It can be loaded into index.html.
-// Note that when running locally, in order to open a web page which uses modules, you must serve the directory over HTTP e.g. with https://www.npmjs.com/package/http-server
-// You can't open the index.html file using a file:// URL.
-
-// Global
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-const DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-const OCCURRENCE_MAP = {
-  first: 1,
-  second: 2,
-  third: 3,
-  fourth: 4,
-};
+import { MONTHS, DAYS, calculateEventDay } from "./common.mjs";
 
 let CURRENT_YEAR = new Date().getFullYear();
 let CURRENT_MONTH = new Date().getMonth();
@@ -86,13 +50,11 @@ nextBtn.addEventListener("click", () => {
   renderCurrentView();
 });
 
-// Updating selectors and then updating UI
 function renderCurrentView() {
   updateSelectors();
   renderCalendar(monthSelect.value, yearSelect.value);
 }
 
-// Updating selectors - adding extra option if needed
 function updateSelectors() {
   const yearOptionExists = Array.from(yearSelect.options).some(
     (opt) => parseInt(opt.value, 10) === CURRENT_YEAR,
@@ -119,7 +81,6 @@ function updateSelectors() {
   yearSelect.value = CURRENT_YEAR;
 }
 
-// Creating options for months
 function createMonthOptions() {
   MONTHS.forEach((id) => {
     const option = document.createElement("option");
@@ -129,7 +90,6 @@ function createMonthOptions() {
   });
 }
 
-// Creating options for years
 function createYearOptions() {
   yearSelect.innerHTML = "";
   for (let year = FIXED_START_YEAR; year <= FIXED_END_YEAR; year++) {
@@ -140,7 +100,6 @@ function createYearOptions() {
   }
 }
 
-// Creating options for days of the week
 function createDaysOptions() {
   DAYS.forEach((id) => {
     const divOption = document.createElement("div");
@@ -150,7 +109,6 @@ function createDaysOptions() {
   });
 }
 
-// Getting details for the selected month and year
 function getMonthDetails(monthName, year) {
   const monthIndex = MONTHS.indexOf(monthName);
   const firstDayOfWeek = new Date(year, monthIndex, 1);
@@ -160,7 +118,6 @@ function getMonthDetails(monthName, year) {
   return { startDayOfWeekIndex, totalDaysInMonth };
 }
 
-// Render calendar
 function renderCalendar(monthName, year) {
   const headers = calendarGrid.querySelectorAll(".day-header");
   calendarGrid.innerHTML = "";
@@ -170,14 +127,12 @@ function renderCalendar(monthName, year) {
     year,
   );
 
-  // Blank padding blocks
   for (let i = 0; i < startDayOfWeekIndex; i++) {
     const blankBlock = document.createElement("div");
     blankBlock.classList.add("calendar-day", "empty-day");
     calendarGrid.appendChild(blankBlock);
   }
 
-  // Rendering number days
   for (let day = 1; day <= totalDaysInMonth; day++) {
     const dayBlock = document.createElement("div");
     dayBlock.classList.add("calendar-day");
@@ -208,7 +163,6 @@ function renderCalendar(monthName, year) {
   }
 }
 
-// Fetch data from days.json
 async function loadDaysData() {
   try {
     const response = await fetch("days.json");
@@ -217,42 +171,8 @@ async function loadDaysData() {
     }
     daysData = await response.json();
   } catch (error) {
-    alert("Failed to load days.json data file: ", error);
+    alert("Failed to load days.json data file: " + error);
   }
-}
-
-// Calculating day for an event
-function calculateEventDay(year, monthName, dayName, occurrence) {
-  const monthIndex = MONTHS.indexOf(monthName);
-  const targetDayOfWeek = DAYS.indexOf(dayName);
-
-  // Going backwards to find "last" day
-  if (occurrence === "last") {
-    const totalDays = new Date(year, monthIndex + 1, 0).getDate();
-    for (let day = totalDays; day >= 1; day--) {
-      const currentDayOfWeek = new Date(year, monthIndex, day).getDay();
-      if (currentDayOfWeek === targetDayOfWeek) {
-        return day;
-      }
-    }
-  }
-
-  const targetCount = OCCURRENCE_MAP[occurrence];
-  let matchCount = 0;
-  const totalDays = new Date(year, monthIndex + 1, 0).getDate();
-
-  for (let day = 1; day <= totalDays; day++) {
-    const currentDayOfWeek = new Date(year, monthIndex, day).getDay();
-
-    if (currentDayOfWeek === targetDayOfWeek) {
-      matchCount++;
-      if (matchCount === targetCount) {
-        return day;
-      }
-    }
-  }
-
-  return null;
 }
 
 init();
